@@ -3,43 +3,13 @@ import { motion, useAnimation } from "framer-motion";
 
 import close_hats from "../../assets/drums_audio/HiHat_Closed_Rock.ogg";
 import open_hats from "../../assets/drums_audio/HiHat_Open_Rock.ogg";
+import { useSelector } from "react-redux";
 
-const HiHats = () => {
+const HiHats = ({ playSound }) => {
+    const { hihatsOpenVolume, hihatsOpenPanning, hihatsCloseVolume, hihatsClosePanning } = useSelector((state) => state.hihats);
+
     const controlsHiHatClosed = useAnimation();
     const controlsHiHatOpen = useAnimation();
-
-    let audioContext = null;
-    let panNode = null;
-
-    const initAudioContext = () => {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            panNode = audioContext.createStereoPanner();
-            panNode.connect(audioContext.destination);
-        }
-    };
-
-    const playSound = (sound, volume, panning) => {
-        let vol = volume;
-        let pan = panning;
-        if (volume == null){
-            vol = 1;
-        }
-        if (panning == null){
-            pan = 0;
-        }
-        initAudioContext();
-
-        const audio = new Audio(sound);
-        const source = audioContext.createMediaElementSource(audio);
-
-        // set volume (0 to 1)
-        audio.volume = vol;
-        // Set pan (left: -1 to right: 1)
-        panNode.pan.value = pan;
-        source.connect(panNode);
-        audio.play();
-    };
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -47,11 +17,11 @@ const HiHats = () => {
 
             switch (event.key) {
                 case 's':
-                    playSound(close_hats, 1, -0.5);
+                    playSound(close_hats, hihatsCloseVolume, hihatsClosePanning);
                     controlsHiHatClosed.start({ scale: 0.95 });
                     break;
                 case 'a':
-                    playSound(open_hats, 1, -0.5);
+                    playSound(open_hats, hihatsOpenVolume, hihatsOpenPanning);
                     controlsHiHatOpen.start({ scale: 0.95 });
                     break;
                 default:
@@ -79,7 +49,11 @@ const HiHats = () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controlsHiHatClosed, controlsHiHatOpen]);
+    }, [
+        controlsHiHatClosed, controlsHiHatOpen,
+        hihatsCloseVolume, hihatsClosePanning,
+        hihatsOpenVolume, hihatsOpenPanning, playSound
+    ]);
 
     const triggerAnim = (drum) => {
         switch (drum) {
@@ -105,7 +79,7 @@ const HiHats = () => {
             <motion.div
                 className="hats-container hat-closed w-48 h-48 flex rounded-full cursor-pointer"
                 animate={controlsHiHatClosed}
-                onClick={() => {playSound(close_hats, 1, -0.5); triggerAnim("closed_hats")}}
+                onClick={() => {playSound(close_hats, hihatsCloseVolume, hihatsClosePanning); triggerAnim("closed_hats")}}
             >
                 <div className="w-48 h-48 grid place-content-center relative">
                     <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -117,7 +91,7 @@ const HiHats = () => {
             <motion.div
                 className="hats-container hat-open w-48 h-48 flex rounded-full cursor-pointer"
                 animate={controlsHiHatOpen}
-                onClick={() => {playSound(open_hats, 0.7, -0.5); triggerAnim("open_hats")}}
+                onClick={() => {playSound(open_hats, hihatsOpenVolume, hihatsOpenPanning); triggerAnim("open_hats")}}
             >
                 <div className="w-48 h-48 grid place-content-center relative">
                     <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -130,4 +104,4 @@ const HiHats = () => {
     )
 }
 
-export default HiHats
+export default HiHats;

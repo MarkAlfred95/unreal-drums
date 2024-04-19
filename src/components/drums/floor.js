@@ -2,41 +2,11 @@ import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
 
 import floor from "../../assets/drums_audio/Floor_Rock.ogg";
+import { useSelector } from "react-redux";
 
-const Floor = () => {
+const Floor = ({ playSound }) => {
 
-    let audioContext = null;
-    let panNode = null;
-
-    const initAudioContext = () => {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            panNode = audioContext.createStereoPanner();
-            panNode.connect(audioContext.destination);
-        }
-    };
-
-    const playSound = (sound, volume, panning) => {
-        let vol = volume;
-        let pan = panning;
-        if (volume == null){
-            vol = 1;
-        }
-        if (panning == null){
-            pan = 0;
-        }
-        initAudioContext();
-
-        const audio = new Audio(sound);
-        const source = audioContext.createMediaElementSource(audio);
-
-        // set volume (0 to 1)
-        audio.volume = vol;
-        // Set pan (left: -1 to right: 1)
-        panNode.pan.value = pan;
-        source.connect(panNode);
-        audio.play();
-    };
+    const { floorVolume, floorPanning } = useSelector((state) => state.toms);
 
     const controls = useAnimation();
 
@@ -46,7 +16,7 @@ const Floor = () => {
 
             switch (event.key) {
                 case 'n':
-                    playSound(floor, 1, 0.5);
+                    playSound(floor, floorVolume, floorPanning);
                     controls.start({ scale: 0.95 });
                     break;
                 default:
@@ -71,7 +41,7 @@ const Floor = () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controls]);
+    }, [controls, floorVolume, floorPanning, playSound]);
 
     const triggerAnim = () => {
         controls.start({ scale: 0.95 });
@@ -85,7 +55,7 @@ const Floor = () => {
             <motion.div
                 className="floor-container w-60 h-60 rounded-full cursor-pointer"
                 animate={controls}
-                onClick={() => {playSound(floor, 1, 0.5); triggerAnim()}}
+                onClick={() => {playSound(floor, floorVolume, floorPanning); triggerAnim()}}
             >
                 <div className="floor-border w-44 h-44 rounded-full grid place-content-center text-2xl font-bold">
                     FLOOR

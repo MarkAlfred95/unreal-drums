@@ -5,45 +5,25 @@ import crash_long from "../../assets/drums_audio/Crash_Long_Rock.ogg";
 import crash_short from "../../assets/drums_audio/Crash_Short_Rock.ogg";
 import splash from "../../assets/drums_audio/Splash_Rock.ogg";
 import ride from "../../assets/drums_audio/Ride_Rock.ogg";
+import { useSelector } from "react-redux";
 
-const Cymbals = () => {
+const Cymbals = ({ playSound }) => {
+
+    const {
+        crashLongVolume,
+        crashLongPanning,
+        crashShortVolume,
+        crashShortPanning,
+        splashVolume,
+        splashPanning,
+        rideVolume,
+        ridePanning,
+    } = useSelector((state) => state.cymbals);
+
     const controlsCrashLong = useAnimation();
     const controlsCrashShort = useAnimation();
     const controlsSplash = useAnimation();
     const controlsRide = useAnimation();
-
-    let audioContext = null;
-    let panNode = null;
-
-    const initAudioContext = () => {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            panNode = audioContext.createStereoPanner();
-            panNode.connect(audioContext.destination);
-        }
-    };
-
-    const playSound = (sound, volume, panning) => {
-        let vol = volume;
-        let pan = panning;
-        if (volume == null){
-            vol = 1;
-        }
-        if (panning == null){
-            pan = 0;
-        }
-        initAudioContext();
-
-        const audio = new Audio(sound);
-        const source = audioContext.createMediaElementSource(audio);
-
-        // set volume (0 to 1)
-        audio.volume = vol;
-        // Set pan (left: -1 to right: 1)
-        panNode.pan.value = pan;
-        source.connect(panNode);
-        audio.play();
-    };
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -51,19 +31,19 @@ const Cymbals = () => {
 
             switch (event.key) {
                 case 'd':
-                    playSound(crash_long, 0.6, -0.4);
+                    playSound(crash_long, crashLongVolume, crashLongPanning);
                     controlsCrashLong.start({ scale: 0.95 });
                     break;
                 case 'f':
-                    playSound(splash, 0.6, -0.25);
+                    playSound(splash, splashVolume, splashPanning);
                     controlsSplash.start({ scale: 0.95 });
                     break;
                 case 'g':
-                    playSound(crash_short, 0.8, 0.25);
+                    playSound(crash_short, crashShortVolume, crashShortPanning);
                     controlsCrashShort.start({ scale: 0.95 });
                     break;
                 case 'h':
-                    playSound(ride, 0.6, 0.4);
+                    playSound(ride, rideVolume, ridePanning);
                     controlsRide.start({ scale: 0.95 });
                     break;
                 default:
@@ -97,7 +77,21 @@ const Cymbals = () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controlsCrashLong, controlsCrashShort, controlsSplash, controlsRide]);
+    }, [
+        controlsCrashLong, 
+        controlsCrashShort, 
+        controlsSplash, 
+        controlsRide,
+        crashLongVolume,
+        crashLongPanning,
+        crashShortVolume,
+        crashShortPanning,
+        splashVolume,
+        splashPanning,
+        rideVolume,
+        ridePanning,
+        playSound
+    ]);
 
     const triggerAnim = (drum) => {
         switch (drum) {
@@ -136,7 +130,7 @@ const Cymbals = () => {
                 <motion.div
                     className="crash-container c-long w-60 h-60 rounded-full cursor-pointer"
                     animate={controlsCrashLong}
-                    onClick={() => {playSound(crash_long, 0.6, -0.4); triggerAnim("crash_long")}}
+                    onClick={() => {playSound(crash_long, crashLongVolume, crashLongPanning); triggerAnim("crash_long")}}
                 >
                     <div className="w-60 h-60 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -150,7 +144,7 @@ const Cymbals = () => {
                 <motion.div
                     className="crash-container c-short w-52 h-52 rounded-full cursor-pointer"
                     animate={controlsCrashShort}
-                    onClick={() => {playSound(crash_short, 0.6, -0.25); triggerAnim("crash_short")}}
+                    onClick={() => {playSound(crash_short, crashShortVolume, crashShortPanning); triggerAnim("crash_short")}}
                 >
                     <div className="w-52 h-52 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -164,7 +158,7 @@ const Cymbals = () => {
                 <motion.div
                     className="crash-container c-splash w-48 h-48 rounded-full cursor-pointer"
                     animate={controlsSplash}
-                    onClick={() => {playSound(splash, 0.8, 0.25); triggerAnim("splash")}}
+                    onClick={() => {playSound(splash, splashVolume, splashPanning); triggerAnim("splash")}}
                 >
                     <div className="w-48 h-48 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -178,7 +172,7 @@ const Cymbals = () => {
                 <motion.div
                     className="crash-container c-ride w-60 h-60 rounded-full cursor-pointer"
                     animate={controlsRide}
-                    onClick={() => {playSound(ride, 0.6, 0.4); triggerAnim("ride")}}
+                    onClick={() => {playSound(ride, rideVolume, ridePanning); triggerAnim("ride")}}
                 >
                     <div className="w-60 h-60 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
