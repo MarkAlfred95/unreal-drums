@@ -1,11 +1,10 @@
 import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
 import { useSelector } from 'react-redux';
-import kick from "../../assets/drums_audio/Kick_Rock.ogg";
 
 const Kick = ({ playSound }) => {
 
-    const { kickVolume, kickPanning } = useSelector((state) => state.kick);
+    const { kickAudio, kickVolume, kickPanning, kickIsMuted } = useSelector((state) => state.kick);
 
     const controlsKick = useAnimation();
 
@@ -15,7 +14,9 @@ const Kick = ({ playSound }) => {
 
             switch (event.key) {
                 case 'z':
-                    playSound(kick, kickVolume, kickPanning);
+                    if (!kickIsMuted) {
+                        playSound(kickAudio, kickVolume, kickPanning);
+                    }
                     controlsKick.start({ scale: 0.95 });
                     break;
                 default:
@@ -40,7 +41,7 @@ const Kick = ({ playSound }) => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controlsKick, kickVolume, kickPanning, playSound]);
+    }, [controlsKick, kickAudio, kickVolume, kickPanning, kickIsMuted, playSound]);
 
     const triggerAnim = () => {
         controlsKick.start({ scale: 0.95 });
@@ -49,12 +50,19 @@ const Kick = ({ playSound }) => {
         }, 100);
     }
 
+    const triggerPlaySound = () => {
+        if (!kickIsMuted) {
+            playSound(kickAudio, kickVolume, kickPanning);
+            triggerAnim();
+        }
+    }
+
     return (
         <div className="kick-wrap flex gap-4 absolute">
             <motion.div
                 className="kick-container w-72 h-72 flex cursor-pointer"
                 animate={controlsKick}
-                onClick={() => {playSound(kick, kickVolume, kickPanning); triggerAnim()}}
+                onClick={triggerPlaySound}
             >
                 <div className="kick-border w-72 h-72 rounded-full">
                     <div className="w-24 h-24 bg-slate-50 rounded-full grid place-content-center text-2xl font-bold">
@@ -77,7 +85,7 @@ const Kick = ({ playSound }) => {
             <motion.div
                 className="kick-container w-72 h-72 flex rounded-full cursor-pointer"
                 animate={controlsKick}
-                onClick={() => {playSound(kick, kickVolume, kickPanning); triggerAnim()}}
+                onClick={triggerPlaySound}
             >
                 <div className="kick-border w-72 h-72 rounded-full">
                     <div className="w-24 h-24 bg-slate-50 rounded-full grid place-content-center text-2xl font-bold">

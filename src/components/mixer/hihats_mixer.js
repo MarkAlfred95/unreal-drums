@@ -1,12 +1,18 @@
 import { useSelector, useDispatch } from "react-redux";
 import { 
     updateHihatsOpenVolume, updateHihatsOpenPanning, 
-    updateHihatsCloseVolume, updateHihatsClosePanning  
+    updateHihatsCloseVolume, updateHihatsClosePanning,
+    updateHihatsOpenIsMuted, updateHihatsCloseIsMuted, 
 } from "../../redux/hihatsSlice";
 
-const HihatsMixer = () => {
+const HihatsMixer = ({ playSound }) => {
 
-    const { hihatsOpenVolume, hihatsOpenPanning, hihatsCloseVolume, hihatsClosePanning } = useSelector((state) => state.hihats);
+    const { 
+        hihatsOpenVolume, hihatsOpenPanning, 
+        hihatsCloseVolume, hihatsClosePanning,
+        hihatsOpenAudio, hihatsOpenIsMuted,
+        hihatsCloseAudio, hihatsCloseIsMuted, 
+    } = useSelector((state) => state.hihats);
     const dispatch = useDispatch();
 
     const handleVolumeChange = (event) => {
@@ -33,9 +39,30 @@ const HihatsMixer = () => {
         return (value * 100).toFixed(0) + '%';
     }
 
+    const handleIsMutedOpen = () => {
+        dispatch(updateHihatsOpenIsMuted(!hihatsOpenIsMuted));
+    };
+    const handleIsMutedClose = () => {
+        dispatch(updateHihatsCloseIsMuted(!hihatsCloseIsMuted));
+    }
+
+    const handlePreviewAudioOpen = () => {
+        if(!hihatsOpenIsMuted){
+            playSound(hihatsOpenAudio, hihatsOpenVolume, hihatsOpenPanning);
+        }
+    }
+    const handlePreviewAudioClose = () => {
+        if(!hihatsCloseIsMuted){
+            playSound(hihatsCloseAudio, hihatsCloseVolume, hihatsClosePanning);
+        }
+    }
+
     return (
         <>
-            <div className="h-96 w-24 p-2 rounded bg-slate-800">
+            <div 
+                className="h-96 w-24 p-2 rounded bg-slate-800"
+                style={{ filter: hihatsOpenIsMuted ? 'brightness(80%)' : 'brightness(100%)' }}
+            >
                 <p className="h-7 text-center text-white font-bold text-sm leading-none">OPEN HIHATS</p>
                 <div className="mt-2 panning-slider-container">
                     <p className="text-white text-xs text-center">Pan</p>
@@ -62,12 +89,25 @@ const HihatsMixer = () => {
                     />
                 </div>
                 <p className="text-center text-white mt-2">{convertToPercent(hihatsOpenVolume)}</p>
-                <div className="flex p-2 justify-between">
-                    <button className="text-xs font-bold w-6 h-6 bg-white grid place-content-center rounded">P</button>
-                    <button className="text-xs font-bold w-6 h-6 bg-white grid place-content-center rounded">M</button>
+                <div className="grid p-2 place-content-center gap-2">
+                    <button 
+                        className="text-xs font-bold w-20 h-6 bg-white grid place-content-center rounded"
+                        onClick={handlePreviewAudioOpen}
+                    >Preview</button>
+                    <button 
+                        className={
+                            `text-xs font-bold w-20 h-6 grid place-content-center rounded 
+                            ${hihatsOpenIsMuted ? 'bg-red-500' : 'bg-green-500'} transition-all`
+                        }
+                        onClick={handleIsMutedOpen}
+                    >{hihatsOpenIsMuted? "Unmute" : "Mute"}</button>
                 </div>
             </div>
-            <div className="h-96 w-24 p-2 rounded bg-slate-800">
+
+            <div 
+                className="h-96 w-24 p-2 rounded bg-slate-800"
+                style={{ filter: hihatsCloseIsMuted ? 'brightness(80%)' : 'brightness(100%)' }}
+            >
                 <p className="h-7 text-center text-white font-bold text-sm leading-none">CLOSED HIHATS</p>
                 <div className="mt-2 panning-slider-container">
                     <p className="text-white text-xs text-center">Pan</p>
@@ -94,9 +134,18 @@ const HihatsMixer = () => {
                     />
                 </div>
                 <p className="text-center text-white mt-2">{convertToPercent(hihatsCloseVolume)}</p>
-                <div className="flex p-2 justify-between">
-                    <button className="text-xs font-bold w-6 h-6 bg-white grid place-content-center rounded">P</button>
-                    <button className="text-xs font-bold w-6 h-6 bg-white grid place-content-center rounded">M</button>
+                <div className="grid p-2 place-content-center gap-2">
+                    <button 
+                        className="text-xs font-bold w-20 h-6 bg-white grid place-content-center rounded"
+                        onClick={handlePreviewAudioClose}
+                    >Preview</button>
+                    <button 
+                        className={
+                            `text-xs font-bold w-20 h-6 grid place-content-center rounded 
+                            ${hihatsCloseIsMuted ? 'bg-red-500' : 'bg-green-500'} transition-all`
+                        }
+                        onClick={handleIsMutedClose}
+                    >{hihatsCloseIsMuted? "Unmute" : "Mute"}</button>
                 </div>
             </div>
         </>

@@ -2,16 +2,12 @@ import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
-import tom_low from "../../assets/drums_audio/Tom_Low_Rock.ogg";
-import tom_mid from "../../assets/drums_audio/Tom_Mid_Rock.ogg";
-import tom_high from "../../assets/drums_audio/Tom_High_Rock.ogg";
-
 const Toms = ({ playSound }) => {
 
     const { 
-        tomHighVolume, tomHighPanning, 
-        tomMidVolume, tomMidPanning, 
-        tomLowVolume, tomLowPanning,
+        tomHighVolume, tomHighPanning, tomHighAudio, tomHighIsMuted,
+        tomMidVolume, tomMidPanning, tomMidAudio, tomMidIsMuted,
+        tomLowVolume, tomLowPanning, tomLowAudio, tomLowIsMuted,
     } = useSelector((state) => state.toms);
 
     const controlsTomHigh = useAnimation();
@@ -24,15 +20,21 @@ const Toms = ({ playSound }) => {
 
             switch (event.key) {
                 case 'c':
-                    playSound(tom_high, tomHighVolume, tomHighPanning);
+                    if (!tomHighIsMuted){
+                        playSound(tomHighAudio, tomHighVolume, tomHighPanning);
+                    }
                     controlsTomHigh.start({ scale: 0.95 });
                     break;
                 case 'v':
-                    playSound(tom_mid, tomMidVolume, tomHighPanning);
+                    if (!tomMidIsMuted){
+                        playSound(tomMidAudio, tomMidVolume, tomMidPanning);
+                    }
                     controlsTomMid.start({ scale: 0.95 });
                     break;
                 case 'b':
-                    playSound(tom_low, tomLowVolume, tomLowPanning);
+                    if (!tomLowIsMuted){
+                        playSound(tomLowAudio, tomLowVolume, tomLowPanning);
+                    }
                     controlsTomLow.start({ scale: 0.95 });
                     break;
                 default:
@@ -67,12 +69,9 @@ const Toms = ({ playSound }) => {
         controlsTomHigh, 
         controlsTomMid, 
         controlsTomLow,
-        tomHighVolume,
-        tomHighPanning,
-        tomMidVolume,
-        tomMidPanning,
-        tomLowVolume,
-        tomLowPanning,
+        tomHighVolume, tomHighPanning, tomHighAudio, tomHighIsMuted,
+        tomMidVolume, tomMidPanning, tomMidAudio, tomMidIsMuted,
+        tomLowVolume, tomLowPanning, tomLowAudio, tomLowIsMuted,
         playSound
     ]);
 
@@ -101,12 +100,31 @@ const Toms = ({ playSound }) => {
         }
     }
 
+    const triggerPlaySoundHigh = () => {
+        if (!tomHighIsMuted){
+            playSound(tomHighAudio, tomHighVolume, tomHighPanning);
+            triggerAnim("tom_high");
+        }
+    }
+    const triggerPlaySoundMid = () => {
+        if (!tomMidIsMuted){
+            playSound(tomMidAudio, tomMidVolume, tomMidPanning);
+            triggerAnim("tom_mid");
+        }
+    }
+    const triggerPlaySoundLow = () => {
+        if (!tomLowIsMuted){
+            playSound(tomLowAudio, tomLowVolume, tomLowPanning);
+            triggerAnim("tom_low");
+        }
+    }
+
     return (
         <div className="tom-wrap flex absolute">
             <motion.div
                 className="tom-container tom-high w-48 h-48 flex rounded-full cursor-pointer"
                 animate={controlsTomHigh}
-                onClick={() => {playSound(tom_high, tomHighVolume, tomHighPanning); triggerAnim("tom_high")}}
+                onClick={triggerPlaySoundHigh}
             >
                 <div className="tom-border w-32 h-32 rounded-full grid place-content-center text-2xl font-bold text-center">
                     TOM HIGH
@@ -122,7 +140,7 @@ const Toms = ({ playSound }) => {
             <motion.div
                 className="tom-container tom-mid relative w-52 h-52 flex rounded-full cursor-pointer"
                 animate={controlsTomMid}
-                onClick={() => {playSound(tom_mid, tomMidVolume, tomMidPanning); triggerAnim("tom_mid")}}
+                onClick={triggerPlaySoundMid}
             >
                 <div className="tom-border w-36 h-36 rounded-full grid place-content-center text-2xl font-bold text-center">
                     TOM MID
@@ -138,7 +156,7 @@ const Toms = ({ playSound }) => {
             <motion.div
                 className="tom-container tom-low w-56 h-56 flex rounded-full cursor-pointer"
                 animate={controlsTomLow}
-                onClick={() => {playSound(tom_low, tomLowVolume, tomLowPanning); triggerAnim("tom_low")}}
+                onClick={triggerPlaySoundLow}
             >
                 <div className="tom-border w-40 h-40 rounded-full grid place-content-center text-2xl font-bold text-center">
                     TOM LOW

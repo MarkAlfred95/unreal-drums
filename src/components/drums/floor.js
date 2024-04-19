@@ -1,12 +1,10 @@
 import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
-
-import floor from "../../assets/drums_audio/Floor_Rock.ogg";
 import { useSelector } from "react-redux";
 
 const Floor = ({ playSound }) => {
 
-    const { floorVolume, floorPanning } = useSelector((state) => state.toms);
+    const { floorVolume, floorPanning, floorAudio, floorIsMuted } = useSelector((state) => state.toms);
 
     const controls = useAnimation();
 
@@ -16,7 +14,9 @@ const Floor = ({ playSound }) => {
 
             switch (event.key) {
                 case 'n':
-                    playSound(floor, floorVolume, floorPanning);
+                    if (!floorIsMuted){
+                        playSound(floorAudio, floorVolume, floorPanning);
+                    }
                     controls.start({ scale: 0.95 });
                     break;
                 default:
@@ -41,7 +41,7 @@ const Floor = ({ playSound }) => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controls, floorVolume, floorPanning, playSound]);
+    }, [controls, floorVolume, floorPanning, floorAudio, floorIsMuted, playSound]);
 
     const triggerAnim = () => {
         controls.start({ scale: 0.95 });
@@ -50,12 +50,19 @@ const Floor = ({ playSound }) => {
         }, 100);
     }
 
+    const triggerPlaySound = () => {
+        if (!floorIsMuted){
+            playSound(floorAudio, floorVolume, floorPanning);
+            triggerAnim();
+        }
+    }
+
     return (
         <div className="floor-wrap grid absolute">
             <motion.div
                 className="floor-container w-60 h-60 rounded-full cursor-pointer"
                 animate={controls}
-                onClick={() => {playSound(floor, floorVolume, floorPanning); triggerAnim()}}
+                onClick={triggerPlaySound}
             >
                 <div className="floor-border w-44 h-44 rounded-full grid place-content-center text-2xl font-bold">
                     FLOOR
