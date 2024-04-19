@@ -1,23 +1,14 @@
 import { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
-
-import crash_long from "../../assets/drums_audio/Crash_Long_Rock.ogg";
-import crash_short from "../../assets/drums_audio/Crash_Short_Rock.ogg";
-import splash from "../../assets/drums_audio/Splash_Rock.ogg";
-import ride from "../../assets/drums_audio/Ride_Rock.ogg";
 import { useSelector } from "react-redux";
 
 const Cymbals = ({ playSound }) => {
 
     const {
-        crashLongVolume,
-        crashLongPanning,
-        crashShortVolume,
-        crashShortPanning,
-        splashVolume,
-        splashPanning,
-        rideVolume,
-        ridePanning,
+        crashLongVolume, crashLongPanning, crashLongAudio, crashLongIsMuted,
+        crashShortVolume, crashShortPanning, crashShortAudio, crashShortIsMuted,
+        splashVolume, splashPanning, splashAudio, splashIsMuted,
+        rideVolume, ridePanning, rideAudio, rideIsMuted,
     } = useSelector((state) => state.cymbals);
 
     const controlsCrashLong = useAnimation();
@@ -31,19 +22,27 @@ const Cymbals = ({ playSound }) => {
 
             switch (event.key) {
                 case 'd':
-                    playSound(crash_long, crashLongVolume, crashLongPanning);
+                    if (!crashLongIsMuted){
+                        playSound(crashLongAudio, crashLongVolume, crashLongPanning);
+                    }
                     controlsCrashLong.start({ scale: 0.95 });
                     break;
                 case 'f':
-                    playSound(splash, splashVolume, splashPanning);
+                    if (!splashIsMuted){
+                        playSound(splashAudio, splashVolume, splashPanning);
+                    }
                     controlsSplash.start({ scale: 0.95 });
                     break;
                 case 'g':
-                    playSound(crash_short, crashShortVolume, crashShortPanning);
+                    if (!crashShortIsMuted){
+                        playSound(crashShortAudio, crashShortVolume, crashShortPanning);
+                    }
                     controlsCrashShort.start({ scale: 0.95 });
                     break;
                 case 'h':
-                    playSound(ride, rideVolume, ridePanning);
+                    if (!rideIsMuted){
+                        playSound(rideAudio, rideVolume, ridePanning);
+                    }
                     controlsRide.start({ scale: 0.95 });
                     break;
                 default:
@@ -78,18 +77,11 @@ const Cymbals = ({ playSound }) => {
             document.removeEventListener('keyup', handleKeyUp);
         };
     }, [
-        controlsCrashLong, 
-        controlsCrashShort, 
-        controlsSplash, 
-        controlsRide,
-        crashLongVolume,
-        crashLongPanning,
-        crashShortVolume,
-        crashShortPanning,
-        splashVolume,
-        splashPanning,
-        rideVolume,
-        ridePanning,
+        controlsCrashLong, controlsCrashShort, controlsSplash, controlsRide,
+        crashLongVolume, crashLongPanning, crashLongAudio, crashLongIsMuted,
+        crashShortVolume, crashShortPanning, crashShortAudio, crashShortIsMuted,
+        splashVolume, splashPanning, splashAudio, splashIsMuted,
+        rideVolume, ridePanning, rideAudio, rideIsMuted,
         playSound
     ]);
 
@@ -124,13 +116,38 @@ const Cymbals = ({ playSound }) => {
         }
     }
 
+    const triggerPlaySoundLong = () => {
+        if (!crashLongIsMuted){
+            playSound(crashLongAudio, crashLongVolume, crashLongPanning);
+            triggerAnim("crash_long");
+        }
+    }
+    const triggerPlaySoundShort = () => {
+        if (!crashShortIsMuted){
+            playSound(crashShortAudio, crashShortVolume, crashShortPanning);
+            triggerAnim("crash_short");
+        }
+    }
+    const triggerPlaySoundSplash = () => {
+        if (!splashIsMuted){
+            playSound(splashAudio, splashVolume, splashPanning);
+            triggerAnim("splash");
+        }
+    }
+    const triggerPlaySoundRide = () => {
+        if (!rideIsMuted){
+            playSound(rideAudio, rideVolume, ridePanning);
+            triggerAnim("ride");
+        }
+    }
+
     return (
         <>
             <div className="crash-long-wrap grid absolute">
                 <motion.div
                     className="crash-container c-long w-60 h-60 rounded-full cursor-pointer"
                     animate={controlsCrashLong}
-                    onClick={() => {playSound(crash_long, crashLongVolume, crashLongPanning); triggerAnim("crash_long")}}
+                    onClick={triggerPlaySoundLong}
                 >
                     <div className="w-60 h-60 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -144,7 +161,7 @@ const Cymbals = ({ playSound }) => {
                 <motion.div
                     className="crash-container c-short w-52 h-52 rounded-full cursor-pointer"
                     animate={controlsCrashShort}
-                    onClick={() => {playSound(crash_short, crashShortVolume, crashShortPanning); triggerAnim("crash_short")}}
+                    onClick={triggerPlaySoundShort}
                 >
                     <div className="w-52 h-52 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -158,7 +175,7 @@ const Cymbals = ({ playSound }) => {
                 <motion.div
                     className="crash-container c-splash w-48 h-48 rounded-full cursor-pointer"
                     animate={controlsSplash}
-                    onClick={() => {playSound(splash, splashVolume, splashPanning); triggerAnim("splash")}}
+                    onClick={triggerPlaySoundSplash}
                 >
                     <div className="w-48 h-48 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -172,7 +189,7 @@ const Cymbals = ({ playSound }) => {
                 <motion.div
                     className="crash-container c-ride w-60 h-60 rounded-full cursor-pointer"
                     animate={controlsRide}
-                    onClick={() => {playSound(ride, rideVolume, ridePanning); triggerAnim("ride")}}
+                    onClick={triggerPlaySoundRide}
                 >
                     <div className="w-60 h-60 grid place-content-center relative">
                         <div className="crash-border w-14 h-14 rounded-full"></div>

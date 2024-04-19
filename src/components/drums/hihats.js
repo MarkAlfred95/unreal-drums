@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
-
-import close_hats from "../../assets/drums_audio/HiHat_Closed_Rock.ogg";
-import open_hats from "../../assets/drums_audio/HiHat_Open_Rock.ogg";
 import { useSelector } from "react-redux";
 
 const HiHats = ({ playSound }) => {
-    const { hihatsOpenVolume, hihatsOpenPanning, hihatsCloseVolume, hihatsClosePanning } = useSelector((state) => state.hihats);
+    const { 
+        hihatsOpenVolume, hihatsOpenPanning, 
+        hihatsCloseVolume, hihatsClosePanning,
+        hihatsOpenAudio, hihatsCloseAudio,
+        hihatsOpenIsMuted, hihatsCloseIsMuted, 
+    } = useSelector((state) => state.hihats);
 
     const controlsHiHatClosed = useAnimation();
     const controlsHiHatOpen = useAnimation();
@@ -17,11 +19,15 @@ const HiHats = ({ playSound }) => {
 
             switch (event.key) {
                 case 's':
-                    playSound(close_hats, hihatsCloseVolume, hihatsClosePanning);
+                    if (!hihatsCloseIsMuted){
+                        playSound(hihatsCloseAudio, hihatsCloseVolume, hihatsClosePanning);
+                    }
                     controlsHiHatClosed.start({ scale: 0.95 });
                     break;
                 case 'a':
-                    playSound(open_hats, hihatsOpenVolume, hihatsOpenPanning);
+                    if (!hihatsOpenIsMuted){
+                        playSound(hihatsOpenAudio, hihatsOpenVolume, hihatsOpenPanning);
+                    }
                     controlsHiHatOpen.start({ scale: 0.95 });
                     break;
                 default:
@@ -52,7 +58,9 @@ const HiHats = ({ playSound }) => {
     }, [
         controlsHiHatClosed, controlsHiHatOpen,
         hihatsCloseVolume, hihatsClosePanning,
-        hihatsOpenVolume, hihatsOpenPanning, playSound
+        hihatsOpenVolume, hihatsOpenPanning,
+        hihatsOpenAudio, hihatsCloseAudio,
+        hihatsOpenIsMuted, hihatsCloseIsMuted, playSound
     ]);
 
     const triggerAnim = (drum) => {
@@ -74,12 +82,25 @@ const HiHats = ({ playSound }) => {
         }
     }
 
+    const triggerPlaySoundClose = () => {
+        if (!hihatsCloseIsMuted){
+            playSound(hihatsCloseAudio, hihatsCloseVolume, hihatsClosePanning);
+            triggerAnim("closed_hats");
+        }
+    }
+    const triggerPlaySoundOpen = () => {
+        if (!hihatsOpenIsMuted){
+            playSound(hihatsOpenAudio, hihatsOpenVolume, hihatsOpenPanning);
+            triggerAnim("open_hats");
+        }
+    }
+
     return (
         <div className="hats-wrap grid absolute">
             <motion.div
                 className="hats-container hat-closed w-48 h-48 flex rounded-full cursor-pointer"
                 animate={controlsHiHatClosed}
-                onClick={() => {playSound(close_hats, hihatsCloseVolume, hihatsClosePanning); triggerAnim("closed_hats")}}
+                onClick={triggerPlaySoundClose}
             >
                 <div className="w-48 h-48 grid place-content-center relative">
                     <div className="crash-border w-14 h-14 rounded-full"></div>
@@ -91,7 +112,7 @@ const HiHats = ({ playSound }) => {
             <motion.div
                 className="hats-container hat-open w-48 h-48 flex rounded-full cursor-pointer"
                 animate={controlsHiHatOpen}
-                onClick={() => {playSound(open_hats, hihatsOpenVolume, hihatsOpenPanning); triggerAnim("open_hats")}}
+                onClick={triggerPlaySoundOpen}
             >
                 <div className="w-48 h-48 grid place-content-center relative">
                     <div className="crash-border w-14 h-14 rounded-full"></div>

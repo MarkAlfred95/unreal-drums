@@ -14,7 +14,6 @@
 }
 .sub-mixer-wrap::-webkit-scrollbar-track {
     background: transparent;
-    margin-bottom: 0.5rem;
 }
 .sub-mixer-wrap::-webkit-scrollbar-thumb {
     background: rgb(14 165 233);
@@ -26,7 +25,7 @@
 
 .slider-wrap{
     width: 100%;
-    height: 12rem;
+    height: 10rem;
     display: grid;
     place-content: center;
 }
@@ -34,7 +33,7 @@
     transform: rotate(270deg);
     -webkit-appearance: none;
     appearance: none;
-    width: 12rem;
+    width: 10rem;
     height: 25px;
     background: rgb(15 23 42);
     outline: none;

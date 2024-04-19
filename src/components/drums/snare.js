@@ -2,10 +2,8 @@ import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
-import snare from "../../assets/drums_audio/Snare_Rock.ogg";
-
 const Snare = ({ playSound }) => {
-    const { snareVolume, snarePanning } = useSelector((state) => state.snare);
+    const { snareAudio, snareVolume, snarePanning, snareIsMuted } = useSelector((state) => state.snare);
 
     const controls = useAnimation();
 
@@ -15,7 +13,9 @@ const Snare = ({ playSound }) => {
 
             switch (event.key) {
                 case 'x':
-                    playSound(snare, snareVolume, snarePanning);
+                    if (!snareIsMuted){
+                        playSound(snareAudio, snareVolume, snarePanning);
+                    }
                     controls.start({ scale: 0.95 });
                     break;
                 default:
@@ -40,7 +40,7 @@ const Snare = ({ playSound }) => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controls, snareVolume, snarePanning, playSound]);
+    }, [controls,snareAudio, snareVolume, snarePanning, snareIsMuted, playSound]);
 
     const triggerAnim = () => {
         controls.start({ scale: 0.95 });
@@ -49,11 +49,18 @@ const Snare = ({ playSound }) => {
         }, 100);
     }
 
+    const triggerPlaySound = () => {
+        if (!snareIsMuted) {
+            playSound(snareAudio, snareVolume, snarePanning);
+            triggerAnim();
+        }
+    }
+
     return (
         <motion.div
             className="snare-container w-60 h-60 absolute rounded-full cursor-pointer"
             animate={controls}
-            onClick={() => {playSound(snare, snareVolume, snarePanning); triggerAnim()}}
+            onClick={triggerPlaySound}
         >
             <div className="snare-border w-48 h-48 rounded-full grid place-content-center text-2xl font-bold">
                 SNARE
