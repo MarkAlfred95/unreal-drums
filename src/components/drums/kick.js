@@ -1,42 +1,11 @@
 import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
-
+import { useSelector } from 'react-redux';
 import kick from "../../assets/drums_audio/Kick_Rock.ogg";
 
-const Kick = () => {
+const Kick = ({ playSound }) => {
 
-    let audioContext = null;
-    let panNode = null;
-
-    const initAudioContext = () => {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            panNode = audioContext.createStereoPanner();
-            panNode.connect(audioContext.destination);
-        }
-    };
-
-    const playSound = (sound, volume, panning) => {
-        let vol = volume;
-        let pan = panning;
-        if (volume == null){
-            vol = 1;
-        }
-        if (panning == null){
-            pan = 0;
-        }
-        initAudioContext();
-
-        const audio = new Audio(sound);
-        const source = audioContext.createMediaElementSource(audio);
-
-        // set volume (0 to 1)
-        audio.volume = vol;
-        // Set pan (left: -1 to right: 1)
-        panNode.pan.value = pan;
-        source.connect(panNode);
-        audio.play();
-    };
+    const { kickVolume, kickPanning } = useSelector((state) => state.kick);
 
     const controlsKick = useAnimation();
 
@@ -46,7 +15,7 @@ const Kick = () => {
 
             switch (event.key) {
                 case 'z':
-                    playSound(kick, 1, 0);
+                    playSound(kick, kickVolume, kickPanning);
                     controlsKick.start({ scale: 0.95 });
                     break;
                 default:
@@ -71,7 +40,7 @@ const Kick = () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [controlsKick]);
+    }, [controlsKick, kickVolume, kickPanning, playSound]);
 
     const triggerAnim = () => {
         controlsKick.start({ scale: 0.95 });
@@ -85,7 +54,7 @@ const Kick = () => {
             <motion.div
                 className="kick-container w-72 h-72 flex cursor-pointer"
                 animate={controlsKick}
-                onClick={() => {playSound(kick, 1, 0); triggerAnim()}}
+                onClick={() => {playSound(kick, kickVolume, kickPanning); triggerAnim()}}
             >
                 <div className="kick-border w-72 h-72 rounded-full">
                     <div className="w-24 h-24 bg-slate-50 rounded-full grid place-content-center text-2xl font-bold">
@@ -108,7 +77,7 @@ const Kick = () => {
             <motion.div
                 className="kick-container w-72 h-72 flex rounded-full cursor-pointer"
                 animate={controlsKick}
-                onClick={() => {playSound(kick, 1, 0); triggerAnim()}}
+                onClick={() => {playSound(kick, kickVolume, kickPanning); triggerAnim()}}
             >
                 <div className="kick-border w-72 h-72 rounded-full">
                     <div className="w-24 h-24 bg-slate-50 rounded-full grid place-content-center text-2xl font-bold">
